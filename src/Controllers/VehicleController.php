@@ -10,6 +10,7 @@ class VehicleController {
     protected $vehicle;
 
     public function __construct(Vehicle $vehicle) {
+        $this->vehicle = $vehicle;
     }
 
     public function findById($id = 99) {
