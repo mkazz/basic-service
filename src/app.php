@@ -11,12 +11,11 @@ $app = new Application();
 
 //Register Service Providers
 $app->register(new DoctrineServiceProvider());
+$app->register(
+    new Providers\Entity\VehicleProvider()
+);
 
 //Register Controller Providers
-$app['vehicle.controller'] = $app->share(function () {
-    return new Controllers\VehicleController();
-});
-
 $app->mount('/vehicle', new Providers\Controller\VehicleControllerProvider());
 
 return $app;

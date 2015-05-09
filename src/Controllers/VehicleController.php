@@ -2,19 +2,17 @@
 
 namespace Mworx\VehicleService\Controllers;
 
+use Silex\Application;
 use Mworx\VehicleService\Entities\Vehicle;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class VehicleController {
 
-    protected $vehicle;
-
-    public function __construct(Vehicle $vehicle) {
-        $this->vehicle = $vehicle;
-    }
-
-    public function findById($id = 99) {
-        return $id;
+    public function findById(Application $app, Request $request) {
+        $vehicle = $app['vehicle_factory'];
+        $id = $request->get('id');
+        return new JsonResponse($vehicle->findById($id));
     }
 }
 

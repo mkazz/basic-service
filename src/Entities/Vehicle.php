@@ -20,10 +20,15 @@ class Vehicle {
         $created,
         $modified,
         $trim_id,
-        $dbal,
+        $dbal
     ;
 
-    public function __construct() {
+    public function __construct($dbal) {
+        $this->dbal = $dbal;
+    }
+
+    public function findById($id) {
+        return $this;
     }
 
 }

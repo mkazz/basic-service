@@ -9,12 +9,7 @@ class VehicleControllerProvider implements ControllerProviderInterface {
 
     public function connect(Application $app) {
         $controller = $app['controllers_factory'];
-
-        $controller->get('/{id}', function ($id) use ($app) {
-            return $app['vehicle.controller']->findById($id);
-        });
-        $controller->get('/test', function () { return "Howdy"; });
-
+        $controller->get('/{id}', 'Mworx\VehicleService\Controllers\VehicleController::findById');
         return $controller;
     }
 }
