@@ -9,6 +9,9 @@ use Mworx\VehicleService\Providers;
 
 $app = new Application();
 
+//Read Configuration
+$app->register(); //some config provider
+
 //Register Service Providers
 $app->register(new DoctrineServiceProvider());
 $app->register(

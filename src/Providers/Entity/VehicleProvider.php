@@ -10,7 +10,7 @@ class VehicleProvider implements ServiceProviderInterface {
 
     public function register(Application $app) {
         $app['vehicle_factory'] = function () {
-            return new Vehicle($app['dbs']);
+            return new Vehicle($app['db']);
         };
     }
 

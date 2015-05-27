@@ -1,0 +1,16 @@
+web:
+    build: .
+    ports:
+     - "5000:80"
+    links:
+     - db
+    environment:
+        - DB_HOST: "localhost"
+        - DB_NAME: ""
+        - DB_DRIVER: "PDO"
+        - DB_USER: "root"
+        - DB_PASS: "root"
+db:
+    image: mysql
+    environment:
+     - MYSQL_ROOT_PASSWORD: "root"
