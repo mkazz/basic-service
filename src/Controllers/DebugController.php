@@ -16,7 +16,7 @@ class DebugController {
 
     public function testDbWrite(Application $app, Request $request) {
         $debug_entity = $app['debug_factory'];
-        return new JsonResponse($debug_entity->testWrite($request->get('thing')));
+        return new JsonResponse($debug_entity->testWrite());
     }
 
     public function testDbRead(Application $app, Request $request) {

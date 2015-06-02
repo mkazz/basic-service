@@ -1,5 +1,4 @@
 #!/bin/sh
-env
-cat /etc/hosts
+
 php -S 0.0.0.0:80 -t /app/src/webroot
 

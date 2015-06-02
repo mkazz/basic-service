@@ -3,6 +3,14 @@ db:
     environment:
      - MYSQL_ROOT_PASSWORD=root
      - MYSQL_DATABASE=mworx
+dbseeder:
+    image: mkaczorowski/dbseeder
+    environment:
+     - SEED_FILE=build.sql
+    links:
+     - db:mysql
+    volumes:
+     - ./:/seed_source
 web:
     build: .
     ports:

@@ -10,10 +10,10 @@ class Debug {
         $this->dbh = $dbh;
     }
 
-    public function testWrite($thing) {
+    public function testWrite() {
         $query = "INSERT INTO test_table SET value = :thing";
-        $params = ['thing' => $thing];
-        return $this->dbh->query($query, $params);
+        $params = ['thing' => rand(10,1000000)];
+        return $this->dbh->executeUpdate($query, $params);
     }
 
     public function testRead() {

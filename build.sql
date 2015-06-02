@@ -1,0 +1,7 @@
+CREATE TABLE test_table (
+    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    value VARCHAR(255) NOT NULL
+);
+
+INSERT INTO test_table SET value = "MATT RULES";
+
