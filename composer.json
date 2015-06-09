@@ -1,7 +1,6 @@
 {
     "name": "mworx/basic-service",
     "description": "Motorworx basic microservice",
-    "version": "0.0.1",
     "authors": [
         {
             "name": "Matt Kaczorowski",
