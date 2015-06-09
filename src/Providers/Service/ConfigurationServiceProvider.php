@@ -1,10 +1,10 @@
 <?php
 
-namespace Mworx\VehicleService\Providers\Service;
+namespace Mworx\BasicService\Providers\Service;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Mworx\VehicleService\Services\ConfigurationService;
+use Mworx\BasicService\Services\ConfigurationService;
 
 class ConfigurationServiceProvider implements ServiceProviderInterface {
 

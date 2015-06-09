@@ -1,6 +1,6 @@
 <?php
 
-namespace Mworx\VehicleService\Services;
+namespace Mworx\BasicService\Services;
 
 class ConfigurationService {
 

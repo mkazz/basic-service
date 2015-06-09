@@ -1,6 +1,6 @@
 {
-    "name": "mworx/vehicle-service",
-    "description": "Motorworx vehicle microservice",
+    "name": "mworx/basic-service",
+    "description": "Motorworx basic microservice",
     "version": "0.0.1",
     "authors": [
         {
@@ -21,8 +21,8 @@
 
     "autoload": {
         "psr-4": {
-            "Mworx\\VehicleService\\": "src/",
-            "Mworx\\VehicleService\\Tests\\": "tests/"
+            "Mworx\\BasicService\\": "src/",
+            "Mworx\\BasicService\\Tests\\": "tests/"
         }
     }
 
