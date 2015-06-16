@@ -11,13 +11,14 @@ use MKaczorowski\BasicService\Providers;
 class BaseApplication extends Application {
 
     public function __construct() {
+        parent::__construct();
         $this->register(
             new Providers\Service\ConfigurationServiceProvider()
         );
 
         $this->register(
             new DoctrineServiceProvider(),
-            ['db.options' => $app['config']->db()]
+            ['db.options' => $this['config']->db()]
         );
     }
 }
