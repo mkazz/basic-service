@@ -1,10 +1,10 @@
 <?php
 
-namespace Mworx\BasicService\Providers\Service;
+namespace MKaczorowski\BasicService\Providers\Service;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Mworx\BasicService\Services\ConfigurationService;
+use MKaczorowski\BasicService\Services\ConfigurationService;
 
 class ConfigurationServiceProvider implements ServiceProviderInterface {
 

@@ -1,6 +1,6 @@
 {
-    "name": "mworx/basic-service",
-    "description": "Motorworx basic microservice",
+    "name": "mkaczorowski/basic-service",
+    "description": "Matt Kaczorowski's basic microservice",
     "authors": [
         {
             "name": "Matt Kaczorowski",
@@ -20,8 +20,8 @@
 
     "autoload": {
         "psr-4": {
-            "Mworx\\BasicService\\": "src/",
-            "Mworx\\BasicService\\Tests\\": "tests/"
+            "MKaczorowski\\BasicService\\": "src/",
+            "MKaczorowski\\BasicService\\Tests\\": "tests/"
         }
     }
 
