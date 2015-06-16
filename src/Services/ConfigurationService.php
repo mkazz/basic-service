@@ -1,6 +1,6 @@
 <?php
 
-namespace Mworx\BasicService\Services;
+namespace MKaczorowski\BasicService\Services;
 
 class ConfigurationService {
 

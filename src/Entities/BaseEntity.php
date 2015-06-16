@@ -1,6 +1,6 @@
 <?php
 
-namespace Mworx\BasicService\Entities;
+namespace MKaczorowski\BasicService\Entities;
 
 class BasicEntity {
 
