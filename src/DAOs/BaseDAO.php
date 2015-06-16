@@ -2,7 +2,7 @@
 
 namespace MKaczorowski\BasicService\DAOs;
 
-class BasicDAO {
+class BaseDAO {
 
     protected 
         $entity,
