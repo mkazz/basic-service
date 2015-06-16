@@ -1,6 +1,8 @@
-<?
+<?php
 
 namespace MKaczorowski\BasicService\Models;
+
+use Silex\Application;
 
 class BaseModel {
 

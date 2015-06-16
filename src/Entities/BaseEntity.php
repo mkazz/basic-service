@@ -2,7 +2,7 @@
 
 namespace MKaczorowski\BasicService\Entities;
 
-class BasicEntity {
+class BaseEntity {
 
     public function __construct($data_array) {
         foreach ($data_array as $field => $value) {
