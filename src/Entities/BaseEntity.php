@@ -4,9 +4,11 @@ namespace MKaczorowski\BasicService\Entities;
 
 class BaseEntity {
 
-    public function __construct($data_array) {
+    public function load($data_array) {
         foreach ($data_array as $field => $value) {
-            $this->$field = $value;
+            if (property_exists($this, $field)) {
+                $this->$field = $value;
+            }
         }
     }
 }
