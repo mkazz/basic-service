@@ -21,7 +21,7 @@
     "autoload": {
         "psr-4": {
             "MKaczorowski\\BasicService\\": "src/",
-            "MKaczorowski\\BasicService\\Tests\\": "tests/"
+            "MKaczorowski\\BasicService\\Tests\\": "tests/unit/"
         }
     }
 
