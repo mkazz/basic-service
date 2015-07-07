@@ -20,7 +20,7 @@ class BaseDAO {
         return $this->error;
     }
 
-    protected function __get($name) {
+    public function __get($name) {
         switch ($name) {
             case "qb":
                 return $this->dbal->createQueryBuilder();
@@ -45,7 +45,11 @@ class BaseDAO {
         return false;
     }
 
-    protected function fetchAll(Entities\BaseEntity $entity, $query, $params = []) {
+    protected function fetchAll($query, $params = [], $entity = null) {
+        if ($entity === null) {
+            $entity = $this->entity;
+        }
+
         try {
             $entities = [];
             $result = $this->dbal->fetchAll($query, $params);
@@ -64,6 +68,17 @@ class BaseDAO {
         }
 
         return false;
+    }
+
+    protected function buildEntityQueryParams(Entities\BaseEntity $entity) {
+        $vars = get_object_vars($entity);
+        $params = [];
+
+        foreach ($vars as $field => $value) {
+            $params[$field] = ":{$field}";
+        }
+
+        return $params;
     }
 
 }
