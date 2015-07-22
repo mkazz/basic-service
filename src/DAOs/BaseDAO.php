@@ -9,11 +9,20 @@ class BaseDAO {
     protected 
         $entity,
         $dbal,
-        $error;
+        $error,
+        $table_name,
+        $operators = [
+            'lessThan'              => '<',
+            'greaterThan'           => '>',
+            'lessThanOrEqualTo'     => '<=',
+            'greaterThanOrEqualTo'  => '>=',
+            'between'               => 'BETWEEN',
+        ];
 
-    public function __construct($dbal, $entity) {
+    public function __construct($dbal, $entity, $table_name) {
         $this->dbal   = $dbal;
         $this->entity = $entity;
+        $this->table_name = $table_name;
     }
 
     public function getError() {
@@ -27,6 +36,49 @@ class BaseDAO {
             default:
                 return null;
         }
+    }
+
+    public function findById(Entities\BaseEntity $entity) {
+        return $this->findBy("id", $entity->id);
+    }
+
+    public function findBy($field, $value) {
+        $entity = $this->entity;
+        if ($entity->isFieldValid($field)) {
+            $params = [$field => $value];
+            $qb = $this->qb;
+            $qb->select("*")
+                ->from($this->table_name)
+                ->where("{$field} = :{$field}");
+
+            return $this->fetchAssoc($entity, $qb->getSQL(), $params);
+        }
+
+        throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
+    }
+
+    public function findAllByOperator($field, $value, $operator, $value2) {
+        $entity = $this->entity;
+        $params = [
+            'value'     => $value,
+            'value2'    => $value2,
+        ];
+
+        if ($entity->isFieldValid($field)) {
+            $qb = $this->qb;
+            $qb->select("*")
+                ->from($this->table_name);
+
+            if ($operator == 'between') {
+                $qb->where("{$field} BETWEEN :value AND :value2");
+            } else {
+                $qb->where("{$field} {$this->operators[$operator]} :value");
+            }
+
+            return $this->fetchAll($qb->getSQL(), $params);
+        }
+
+        throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
     }
 
     protected function fetchAssoc(Entities\BaseEntity $entity, $query, $params = []) {
