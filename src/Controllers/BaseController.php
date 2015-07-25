@@ -116,7 +116,7 @@ abstract class BaseController {
         $entities = $model->findAllByOperator($field, $value, $operator, $value2);
         $response = new JsonResponse($entities);
 
-        if (empty($vehicles)) {
+        if (empty($entities)) {
             $response->setStatusCode(204);
         }
 

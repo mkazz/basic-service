@@ -97,6 +97,26 @@ class BaseDAO {
         throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
     }
 
+    public function save(Entities\BaseEntity &$entity) {
+        $params = $this->buildEntityQueryParams($entity);
+        $sets   = $this->buildEntitySetParams($entity);
+
+        $query = "
+            REPLACE INTO
+                {$this->table_name}
+            SET
+                {$sets}";
+
+        $result = $this->dbal->executeQuery($query, $params);
+        if ($result->rowCount() > 0) {
+            if (empty($params['id'])) {
+                $entity->id = $this->dbal->lastInsertId();
+            }
+            return true;
+        }
+        return false;
+    }
+
     protected function fetchAssoc(Entities\BaseEntity $entity, $query, $params = []) {
         try {
             $result = $this->dbal->fetchAssoc($query, $params);
@@ -138,12 +158,32 @@ class BaseDAO {
         return false;
     }
 
+    protected function buildEntitySetParams(Entities\BaseEntity $entity) {
+        $vars = get_object_vars($entity);
+        $entity_name = get_class($entity);
+        $fresh_entity = new $entity_name($entity);
+        $sets = '';
+
+        foreach ($vars as $field => $value) {
+            if ($fresh_entity->isFieldValid($field)) {
+                $sets .= " {$field} = :{$field},\n";
+            }
+        }
+        $sets = rtrim($sets, ",\n");
+
+        return $sets;
+    }
+
     protected function buildEntityQueryParams(Entities\BaseEntity $entity) {
         $vars = get_object_vars($entity);
+        $entity_name = get_class($entity);
+        $fresh_entity = new $entity_name($entity);
         $params = [];
 
         foreach ($vars as $field => $value) {
-            $params[$field] = ":{$field}";
+            if ($fresh_entity->isFieldValid($field)) {
+                $params[$field] = $value;
+            }
         }
 
         return $params;
