@@ -42,6 +42,22 @@ class BaseDAO {
         return $this->findBy("id", $entity->id);
     }
 
+    public function findAllBy($field, $value) {
+        $entity = $this->entity;
+        if ($entity->isFieldValid($field)) {
+            $params = [$field => $value];
+            $qb = $this->qb;
+            $qb->select("*")
+                ->from($this->table_name)
+                ->where("$field = :{$field}");
+
+            return $this->fetchAll($qb->getSQL(), $params);
+        }
+
+        $this->error = "Field: {$field} is not a valid field";
+        return false;
+    }
+
     public function findBy($field, $value) {
         $entity = $this->entity;
         if ($entity->isFieldValid($field)) {
