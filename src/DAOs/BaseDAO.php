@@ -4,7 +4,7 @@ namespace MKaczorowski\BasicService\DAOs;
 
 use MKaczorowski\BasicService\Entities;
 
-class BaseDAO {
+abstract class BaseDAO {
 
     protected 
         $entity,

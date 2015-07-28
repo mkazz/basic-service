@@ -2,7 +2,8 @@
 
 namespace MKaczorowski\BasicService\Entities;
 
-class BaseEntity {
+abstract class BaseEntity {
+
 
     public function load($data_array) {
         foreach ($data_array as $field => $value) {
