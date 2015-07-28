@@ -158,6 +158,15 @@ abstract class BaseDAO {
         return false;
     }
 
+    protected function write($query, $params = []) {
+        $result = $this->dbal->executeQuery($query, $params);
+        if ($result->rowCount() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     protected function buildEntitySetParams(Entities\BaseEntity $entity) {
         $vars = get_object_vars($entity);
         $entity_name = get_class($entity);
