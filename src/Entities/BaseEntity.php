@@ -4,6 +4,8 @@ namespace MKaczorowski\BasicService\Entities;
 
 abstract class BaseEntity {
 
+    protected $_LABEL;
+    protected $_LABEL_PLURAL;
 
     public function load($data_array) {
         foreach ($data_array as $field => $value) {
@@ -15,6 +17,10 @@ abstract class BaseEntity {
 
     public function isFieldValid($field) {
         return property_exists($this, $field);
+    }
+
+    public function getLabel() {
+        return $this->_LABEL;
     }
 }
 
