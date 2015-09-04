@@ -16,6 +16,20 @@ abstract class BaseModel {
         $this->entity_factory_key = $entity_factory_key;
     }
 
+    public function fetchRelations($entity) {
+        $relations = [];
+        foreach ($entity->getRelations() as $key => $factory) {
+            $model          = $this->app["{$factory}_model_factory"];
+            $related_entity = $model->findById($entity->$key);
+
+            if (isset($related_entity)) {
+                $relations[$related_entity->getLabel()] = $related_entity;
+            }
+        }
+        $entity->loadRelations($relations);
+        return $entity;
+    }
+
     public function findById($id) {
         $entity = $this->app[$this->entity_factory_key];
         $entity->id = $id;
