@@ -11,6 +11,16 @@ abstract class BaseEntity {
     private 
         $_fk_map;
 
+    /* Sample FK map
+    private 
+        $_fk_map = [
+            'some_foreign_key_field' => 'some_object',
+            ...
+            ...
+            'some_other_key' => 'some_other_object'
+        ];
+     */
+
     public function load($data_array) {
         foreach ($data_array as $field => $value) {
             if ($this->isFieldValid($field)) {
@@ -31,6 +41,10 @@ abstract class BaseEntity {
 
     public function getLabel() {
         return $this->_LABEL;
+    }
+
+    public function getRelations() {
+        return $this->_fk_map;
     }
 }
 
