@@ -6,13 +6,11 @@ abstract class BaseEntity {
 
     protected 
         $_LABEL,
-        $_LABEL_PLURAL;
-
-    private 
+        $_LABEL_PLURAL,
         $_fk_map;
 
     /* Sample FK map
-    private 
+    protected
         $_fk_map = [
             'some_foreign_key_field' => 'some_object',
             ...
