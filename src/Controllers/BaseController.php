@@ -14,6 +14,20 @@ abstract class BaseController {
         $model_factory_key,
         $entity_factory_key;
 
+    protected function _list(Application $app, Request $request) {
+        $model  = $app[$this->model_factory_key];
+        $entity = $app[$this->entity_factory_key];
+
+        $entities = $model->findAll();
+        $response = new JsonResponse($entities);
+
+        if (empty($entities)) {
+            $response->setStatusCode(204);
+        }
+
+        return $response;
+    }
+
     public function save(Application $app, Request $request) {
         $model  = $app[$this->model_factory_key];
         $entity = $app[$this->entity_factory_key];

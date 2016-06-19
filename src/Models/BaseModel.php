@@ -30,6 +30,10 @@ abstract class BaseModel {
         return $entity;
     }
 
+    public function findAll() {
+        return $this->dao->findAll();
+    }
+
     public function findById($id) {
         $entity = $this->app[$this->entity_factory_key];
         $entity->id = $id;
