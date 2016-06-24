@@ -57,15 +57,7 @@ abstract class BaseDAO {
         $this->error = "Field: {$field} is not a valid field";
         return false;
     }
-/*
-    public function findAll() {
-        $entity = $this-entity;
-        $qb = $this->qb;
-        $qb->select("*")
-            ->from($this->table_name);
-        return $this->fetchAll($qb->getSQL(), $params);
-    }
- */
+
     public function findBy($field, $value) {
         $entity = $this->entity;
         if ($entity->isFieldValid($field)) {
