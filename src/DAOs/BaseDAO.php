@@ -6,7 +6,7 @@ use MKaczorowski\BasicService\Entities;
 
 abstract class BaseDAO {
 
-    protected 
+    protected
         $entity,
         $dbal,
         $error,
@@ -71,6 +71,30 @@ abstract class BaseDAO {
         }
 
         throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
+    }
+
+    public function findAllByParent($parent, $parent_id) {
+        $entity = $this->entity;
+        $parent_key = "{$parent}_id";
+        $params = [
+            $parent_key => $parent_id,
+        ];
+
+        $join_table = $entity->getJoinTable($parent);
+        if ($join_table !== null) {
+            $qb = $this->qb;
+            $qb->select("*")
+                ->from($this->table_name, 'l')
+                ->leftJoin(
+                  'l',
+                  $join_table,
+                  'r',
+                  "l.id = r.{$entity->getLabel()}_id"
+                )
+                ->where("r.{$parent_key}  =  {$parent_id}");
+
+            return $this->fetchAll($qb->getSQL(), $params);
+        }
     }
 
     public function findAllByOperator($field, $value, $operator, $value2) {
@@ -199,4 +223,3 @@ abstract class BaseDAO {
     }
 
 }
-

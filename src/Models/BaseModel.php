@@ -6,7 +6,7 @@ use Silex\Application;
 
 abstract class BaseModel {
 
-    protected 
+    protected
         $app,
         $dao,
         $entity_factory_key;
@@ -30,8 +30,26 @@ abstract class BaseModel {
         return $entity;
     }
 
+    public function fetchHasMany($entity) {
+        $has_many = [];
+        foreach ($entity->has_many as $key => $join_table) {
+            $model = $this->app["{$key}_model_factory"];
+            $label = $entity->getLabel();
+            $related_entities = $model->findAllByParent($label, $entity->id);
+            if (!empty($related_entities)) {
+                $has_many[$related_entities[0]->getLabel(true)] = $related_entities;
+            }
+        }
+        $entity->loadRelations($has_many);
+        return $entity;
+    }
+
     public function findAll() {
         return $this->dao->findAll();
+    }
+
+    public function findAllByParent($parent, $parent_id) {
+        return $this->dao->findAllByParent($parent, $parent_id);
     }
 
     public function findById($id) {
@@ -59,4 +77,3 @@ abstract class BaseModel {
         return $result;
     }
 }
-
