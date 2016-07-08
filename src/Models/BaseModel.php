@@ -18,6 +18,10 @@ abstract class BaseModel {
 
     public function fetchRelations($entity) {
         $relations = [];
+        if (empty($entity) || empty($entity->getRelations())) {
+          return $entity;
+        }
+
         foreach ($entity->getRelations() as $key => $factory) {
             $model          = $this->app["{$factory}_model_factory"];
             $related_entity = $model->findById($entity->$key);
@@ -32,6 +36,10 @@ abstract class BaseModel {
 
     public function fetchHasMany($entity) {
         $has_many = [];
+        if (empty($entity->has_many)) {
+          return $entity;
+        }
+
         foreach ($entity->has_many as $key => $join_table) {
             $model = $this->app["{$key}_model_factory"];
             $label = $entity->getLabel();
