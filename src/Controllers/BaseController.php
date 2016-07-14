@@ -32,7 +32,7 @@ abstract class BaseController {
         $model  = $app[$this->model_factory_key];
         $entity = $app[$this->entity_factory_key];
 
-        $entity->load($request->request->all());
+        $entity->load(json_decode($request->getContent()));
         $result = $model->save($entity);
 
         $response = new JsonResponse($entity);
@@ -138,4 +138,3 @@ abstract class BaseController {
     }
 
 }
-
