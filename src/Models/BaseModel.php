@@ -79,7 +79,7 @@ abstract class BaseModel {
         return $this->dao->findAllBy($field, $value);
     }
 
-    public function save($entity) {
+    public function save(&$entity) {
         $result = $this->dao->save($entity);
         $this->error = $this->dao->getError();
         return $result;
