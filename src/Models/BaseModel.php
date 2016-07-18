@@ -71,6 +71,27 @@ abstract class BaseModel {
         return $this->dao->findBy($field, $value);
     }
 
+    public function findAllByLike($field, $value) {
+        return $this->dao->findAllByLike($field, $value);
+    }
+
+    public function findAllByLikeWithParent(
+      $field,
+      $value,
+      $parent,
+      $parent_name) {
+        $parent_object = $this->app["{$parent}_model_factory"]->findBy('name', $parent_name);
+        if (!empty($parent_object)) {
+          return $this->dao->findAllByLikeWithParent(
+            $field,
+            $value,
+            $parent,
+            $parent_object->id
+          );
+        }
+      return false;
+    }
+
     public function findAllByOperator($field, $value, $operator, $value2) {
         return $this->dao->findAllByOperator($field, $value, $operator, $value2);
     }

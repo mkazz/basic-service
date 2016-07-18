@@ -76,6 +76,59 @@ abstract class BaseController {
         return $response;
     }
 
+    public function findAllByLike(Application $app, Request $request) {
+      $field = $request->get('field');
+      $value = $request->get('value');
+
+      $model = $app[$this->model_factory_key];
+      $entity = $app[$this->entity_factory_key];
+
+      if (!$entity->isFieldValid($field)){
+          $response = new JsonResponse(['error' => "$field is not a valid field"]);
+          $response->setStatusCode(400);
+          return $response;
+      }
+
+      $entities = $model->findAllByLike($field, $value);
+      $response = new JsonResponse($entities);
+
+      if (empty($entities)) {
+          $response->setStatusCode(204);
+      }
+
+      return $response;
+    }
+
+    public function findAllByLikeWithParent(Application $app, Request $request) {
+      $field        = $request->get('field');
+      $value        = $request->get('value');
+      $parent       = $request->get('parent');
+      $parent_name  = $request->get('parent_name');
+
+      $model = $app[$this->model_factory_key];
+      $entity = $app[$this->entity_factory_key];
+
+      if (!$entity->isFieldValid($field)){
+          $response = new JsonResponse(['error' => "$field is not a valid field"]);
+          $response->setStatusCode(400);
+          return $response;
+      }
+
+      $entities = $model->findAllByLikeWithParent(
+        $field,
+        $value,
+        $parent,
+        $parent_name
+      );
+      $response = new JsonResponse($entities);
+
+      if (empty($entities)) {
+          $response->setStatusCode(204);
+      }
+
+      return $response;
+    }
+
     public function findAllBy(Application $app, Request $request) {
         $field = $request->get('field');
         $value = $request->get('value');

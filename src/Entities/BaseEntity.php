@@ -44,6 +44,10 @@ abstract class BaseEntity {
         return property_exists($this, $field);
     }
 
+    public function isFieldReadOnly($field) {
+        return in_array($field, $this->_read_only);
+    }
+
     public function getLabel($plural = false) {
         return $plural == true ? $this->_LABEL_PLURAL : $this->_LABEL;
     }
