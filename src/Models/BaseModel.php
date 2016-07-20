@@ -6,7 +6,7 @@ use Silex\Application;
 
 abstract class BaseModel {
 
-    protected 
+    protected
         $app,
         $dao,
         $entity_factory_key;
@@ -18,6 +18,10 @@ abstract class BaseModel {
 
     public function fetchRelations($entity) {
         $relations = [];
+        if (empty($entity) || empty($entity->getRelations())) {
+          return $entity;
+        }
+
         foreach ($entity->getRelations() as $key => $factory) {
             $model          = $this->app["{$factory}_model_factory"];
             $related_entity = $model->findById($entity->$key);
@@ -30,8 +34,30 @@ abstract class BaseModel {
         return $entity;
     }
 
+    public function fetchHasMany($entity) {
+        $has_many = [];
+        if (empty($entity->has_many)) {
+          return $entity;
+        }
+
+        foreach ($entity->has_many as $key => $join_table) {
+            $model = $this->app["{$key}_model_factory"];
+            $label = $entity->getLabel();
+            $related_entities = $model->findAllByParent($label, $entity->id);
+            if (!empty($related_entities)) {
+                $has_many[$related_entities[0]->getLabel(true)] = $related_entities;
+            }
+        }
+        $entity->loadRelations($has_many);
+        return $entity;
+    }
+
     public function findAll() {
         return $this->dao->findAll();
+    }
+
+    public function findAllByParent($parent, $parent_id) {
+        return $this->dao->findAllByParent($parent, $parent_id);
     }
 
     public function findById($id) {
@@ -45,6 +71,27 @@ abstract class BaseModel {
         return $this->dao->findBy($field, $value);
     }
 
+    public function findAllByLike($field, $value) {
+        return $this->dao->findAllByLike($field, $value);
+    }
+
+    public function findAllByLikeWithParent(
+      $field,
+      $value,
+      $parent,
+      $parent_name) {
+        $parent_object = $this->app["{$parent}_model_factory"]->findBy('name', $parent_name);
+        if (!empty($parent_object)) {
+          return $this->dao->findAllByLikeWithParent(
+            $field,
+            $value,
+            $parent,
+            $parent_object->id
+          );
+        }
+      return false;
+    }
+
     public function findAllByOperator($field, $value, $operator, $value2) {
         return $this->dao->findAllByOperator($field, $value, $operator, $value2);
     }
@@ -53,10 +100,9 @@ abstract class BaseModel {
         return $this->dao->findAllBy($field, $value);
     }
 
-    public function save($entity) {
+    public function save(&$entity) {
         $result = $this->dao->save($entity);
         $this->error = $this->dao->getError();
         return $result;
     }
 }
-
