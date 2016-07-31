@@ -2,12 +2,10 @@
 
 namespace MKaczorowski\BasicService\DAOs;
 
-use MKaczorowski\BasicService\Entities;
-
 abstract class BaseDAO {
 
     protected
-        $entity,
+        $model,
         $dbal,
         $error,
         $table_name,
@@ -19,9 +17,9 @@ abstract class BaseDAO {
             'between'               => 'BETWEEN',
         ];
 
-    public function __construct($dbal, $entity, $table_name) {
+    public function __construct($dbal, $model, $table_name) {
         $this->dbal   = $dbal;
-        $this->entity = $entity;
+        $this->model = $model;
         $this->table_name = $table_name;
     }
 
@@ -38,13 +36,13 @@ abstract class BaseDAO {
         }
     }
 
-    public function findById(Entities\BaseEntity $entity) {
-        return $this->findBy("id", $entity->id);
+    public function findById($id) {
+        return $this->findBy("id", $id);
     }
 
     public function findAllBy($field, $value) {
-        $entity = $this->entity;
-        if ($entity->isFieldValid($field)) {
+        $model = $this->model;
+        if ($model->isFieldValid($field)) {
             $params = [$field => $value];
             $qb = $this->qb;
             $qb->select("*")
@@ -59,23 +57,22 @@ abstract class BaseDAO {
     }
 
     public function findBy($field, $value) {
-        $entity = $this->entity;
-        if ($entity->isFieldValid($field)) {
+        if ($this->model->isFieldValid($field)) {
             $params = [$field => $value];
             $qb = $this->qb;
             $qb->select("*")
                 ->from($this->table_name)
                 ->where("{$field} = :{$field}");
 
-            return $this->fetchAssoc($entity, $qb->getSQL(), $params);
+            return $this->fetchAssoc($qb->getSQL(), $params);
         }
 
         throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
     }
 
     public function findAllByLike($field, $value) {
-      $entity = $this->entity;
-      if ($entity->isFieldValid($field)) {
+      $model = $this->model;
+      if ($model->isFieldValid($field)) {
           $params = [$field => "{$value}%"];
           $qb = $this->qb;
           $qb->select("*")
@@ -94,8 +91,8 @@ abstract class BaseDAO {
       $value,
       $parent,
       $parent_id) {
-      $entity = $this->entity;
-      if ($entity->isFieldValid($field)) {
+      $model = $this->model;
+      if ($model->isFieldValid($field)) {
           $parent_key = "{$parent}_id";
           $params = [
             $field => "{$value}%",
@@ -118,13 +115,13 @@ abstract class BaseDAO {
     }
 
     public function findAllByParent($parent, $parent_id) {
-        $entity = $this->entity;
+        $model = $this->model;
         $parent_key = "{$parent}_id";
         $params = [
             $parent_key => $parent_id,
         ];
 
-        $join_table = $entity->getJoinTable($parent);
+        $join_table = $model->getJoinTable($parent);
         if ($join_table !== null) {
             $qb = $this->qb;
             $qb->select("*")
@@ -133,7 +130,7 @@ abstract class BaseDAO {
                   'l',
                   $join_table,
                   'r',
-                  "l.id = r.{$entity->getLabel()}_id"
+                  "l.id = r.{$model->getLabel()}_id"
                 )
                 ->where("r.{$parent_key}  =  {$parent_id}");
 
@@ -142,13 +139,13 @@ abstract class BaseDAO {
     }
 
     public function findAllByOperator($field, $value, $operator, $value2) {
-        $entity = $this->entity;
+        $model = $this->model;
         $params = [
             'value'     => $value,
             'value2'    => $value2,
         ];
 
-        if ($entity->isFieldValid($field)) {
+        if ($model->isFieldValid($field)) {
             $qb = $this->qb;
             $qb->select("*")
                 ->from($this->table_name);
@@ -165,9 +162,9 @@ abstract class BaseDAO {
         throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
     }
 
-    public function save(Entities\BaseEntity &$entity) {
-        $params = $this->buildEntityQueryParams($entity);
-        $sets   = $this->buildEntitySetParams($entity);
+    public function save(Models\BaseModel &$model) {
+        $params = $this->buildModelQueryParams($model);
+        $sets   = $this->buildModelSetParams($model);
 
         $query = "
             REPLACE INTO
@@ -178,47 +175,27 @@ abstract class BaseDAO {
         $result = $this->dbal->executeQuery($query, $params);
         if ($result->rowCount() > 0) {
             if (empty($params['id'])) {
-                $entity->id = $this->dbal->lastInsertId();
+                $model->id = $this->dbal->lastInsertId();
             }
             return true;
         }
         return false;
     }
 
-    protected function fetchAssoc(Entities\BaseEntity $entity, $query, $params = []) {
+    protected function fetchAssoc($query, $params = []) {
         try {
-            $result = $this->dbal->fetchAssoc($query, $params);
-            if (!empty($result)) {
-                $entity->load($result);
-                return $entity;
-            }
-
-            return null;
+            return $this->dbal->fetchAssoc($query, $params);
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
         }
-
         return false;
     }
 
-    protected function fetchAll($query, $params = [], $entity = null) {
-        if ($entity === null) {
-            $entity = $this->entity;
-        }
-
+    protected function fetchAll($query, $params = []) {
         try {
-            $entities = [];
-            $result = $this->dbal->fetchAll($query, $params);
-            if (!empty($result)) {
-                $class_name = get_class($entity);
-                foreach ($result as $row) {
-                    $entity = new $class_name();
-                    $entity->load($row);
-                    $entities[] = $entity;
-                }
-            }
+            $models = [];
+            return $this->dbal->fetchAll($query, $params);
 
-            return $entities;
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
         }
@@ -235,14 +212,14 @@ abstract class BaseDAO {
         return false;
     }
 
-    protected function buildEntitySetParams(Entities\BaseEntity $entity) {
-        $vars = get_object_vars($entity);
-        $entity_name = get_class($entity);
-        $fresh_entity = new $entity_name($entity);
+    protected function buildModelSetParams(Models\BaseModel $model) {
+        $vars = get_object_vars($model);
+        $model_name = get_class($model);
+        $fresh_model = new $model_name($model);
         $sets = '';
 
         foreach ($vars as $field => $value) {
-            if ($fresh_entity->isFieldValid($field) && !$fresh_entity->isFieldReadOnly($field)) {
+            if ($fresh_model->isFieldValid($field) && !$fresh_model->isFieldReadOnly($field)) {
                 $sets .= " {$field} = :{$field},\n";
             }
         }
@@ -251,14 +228,14 @@ abstract class BaseDAO {
         return $sets;
     }
 
-    protected function buildEntityQueryParams(Entities\BaseEntity $entity) {
-        $vars = get_object_vars($entity);
-        $entity_name = get_class($entity);
-        $fresh_entity = new $entity_name($entity);
+    protected function buildModelQueryParams(Models\BaseModel $model) {
+        $vars = get_object_vars($model);
+        $model_name = get_class($model);
+        $fresh_model = new $model_name($model);
         $params = [];
 
         foreach ($vars as $field => $value) {
-            if ($fresh_entity->isFieldValid($field)) {
+            if ($fresh_model->isFieldValid($field)) {
                 $params[$field] = $value;
             }
         }

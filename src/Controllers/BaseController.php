@@ -16,7 +16,7 @@ abstract class BaseController {
 
     protected function _list(Application $app, Request $request) {
         $model  = $app[$this->model_factory_key];
-        $entity = $app[$this->entity_factory_key];
+        //$entity = $app[$this->entity_factory_key];
 
         $entities = $model->findAll();
         $response = new JsonResponse($entities);
@@ -32,10 +32,10 @@ abstract class BaseController {
         $model  = $app[$this->model_factory_key];
         $entity = $app[$this->entity_factory_key];
 
-        $entity->load(json_decode($request->getContent()));
+        $model->load(json_decode($request->getContent()));
         $result = $model->save($entity);
 
-        $response = new JsonResponse($entity);
+        $response = new JsonResponse($model);
         $response->setStatusCode(201);
 
         if ($result !== true) {
@@ -46,9 +46,9 @@ abstract class BaseController {
     }
 
     public function findById(Application $app, Request $request) {
-        $model  = $app[$this->model_factory_key];
+        //$model  = $app[$this->model_factory_key];
         $id     = $request->get('id');
-        $entity = $model->findById($id);
+        $entity = $app[$this->model_factory_key]->findById($id);
 
         $response = new JsonResponse($entity);
 
@@ -67,7 +67,7 @@ abstract class BaseController {
         $entity = $model->findBy($field, $value);
         $response = new JsonResponse($entity);
 
-        if (!$entity instanceof BaseEntity && $entity !== false) {
+        if (!$entity instanceof BaseModel && $entity !== false) {
             $response->setStatusCode(204);
         } elseif ($entity === false) {
             $response->setStatusCode(400);
@@ -83,7 +83,7 @@ abstract class BaseController {
       $model = $app[$this->model_factory_key];
       $entity = $app[$this->entity_factory_key];
 
-      if (!$entity->isFieldValid($field)){
+      if (!$model->isFieldValid($field)){
           $response = new JsonResponse(['error' => "$field is not a valid field"]);
           $response->setStatusCode(400);
           return $response;
@@ -108,7 +108,7 @@ abstract class BaseController {
       $model = $app[$this->model_factory_key];
       $entity = $app[$this->entity_factory_key];
 
-      if (!$entity->isFieldValid($field)){
+      if (!$model->isFieldValid($field)){
           $response = new JsonResponse(['error' => "$field is not a valid field"]);
           $response->setStatusCode(400);
           return $response;
@@ -136,7 +136,7 @@ abstract class BaseController {
         $model = $app[$this->model_factory_key];
         $entity = $app[$this->entity_factory_key];
 
-        if (!$entity->isFieldValid($field)){
+        if (!$model->isFieldValid($field)){
             $response = new JsonResponse(['error' => "$field is not a valid field"]);
             $response->setStatusCode(400);
             return $response;
@@ -174,7 +174,7 @@ abstract class BaseController {
             return $response;
         }
 
-        if (!$entity->isFieldValid($field)){
+        if (!$model->isFieldValid($field)){
             $response = new JsonResponse(['error' => "$field is not a valid field"]);
             $response->setStatusCode(400);
             return $response;

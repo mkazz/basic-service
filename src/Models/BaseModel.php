@@ -21,63 +21,57 @@ abstract class BaseModel {
         $this->app = $app;
     }
 
-    public function fetchRelations($entity) {
+    public function fetchRelations() {
         $relations = [];
-        if (empty($entity) || empty($entity->getRelations())) {
-          return $entity;
+        if (empty($this->getRelations())) {
+          return;
         }
+        foreach ($this->getRelations() as $key => $factory) {
+            $model         = $this->app["{$factory}_model_factory"];
+            $related_model = $model->findById($model->$key);
 
-        foreach ($entity->getRelations() as $key => $factory) {
-            $model          = $this->app["{$factory}_model_factory"];
-            $related_entity = $model->findById($entity->$key);
-
-            if (isset($related_entity)) {
-                $relations[$related_entity->getLabel()] = $related_entity;
+            if (isset($related_model)) {
+                $relations[$related_model->getLabel()] = $related_model;
             }
         }
-        $entity->loadRelations($relations);
-        return $entity;
+        $this->loadRelations($relations);
     }
 
-    public function fetchHasMany($entity) {
+    public function fetchHasMany() {
         $has_many = [];
-        if (empty($entity->has_many)) {
-          return $entity;
+        if (empty($this->has_many)) {
+          return;
         }
 
-        foreach ($entity->has_many as $key => $join_table) {
+        foreach ($this->has_many as $key => $join_table) {
             $model = $this->app["{$key}_model_factory"];
-            $label = $entity->getLabel();
-            $related_entities = $model->findAllByParent($label, $entity->id);
+            $label = $this->getLabel();
+            $related_entities = $model->findAllByParent($label, $this->id);
             if (!empty($related_entities)) {
                 $has_many[$related_entities[0]->getLabel(true)] = $related_entities;
             }
         }
-        $entity->loadRelations($has_many);
-        return $entity;
+        $this->loadRelations($has_many);
     }
 
     public function findAll() {
-        return $this->dao->findAll();
+        return $this->returnMany($this->dao->findAll());
     }
 
     public function findAllByParent($parent, $parent_id) {
-        return $this->dao->findAllByParent($parent, $parent_id);
+        return $this->returnMany($this->dao->findAllByParent($parent, $parent_id));
     }
 
     public function findById($id) {
-        $entity = $this->app[$this->entity_factory_key];
-        $entity->id = $id;
-        $entity = $this->dao->findById($entity);
-        return $entity;
+        return $this->returnOne($this->dao->findById($id));
     }
 
     public function findBy($field, $value) {
-        return $this->dao->findBy($field, $value);
+        return $this->returnOne($this->dao->findBy($field, $value));
     }
 
     public function findAllByLike($field, $value) {
-        return $this->dao->findAllByLike($field, $value);
+        return $this->returnMany($this->dao->findAllByLike($field, $value));
     }
 
     public function findAllByLikeWithParent(
@@ -87,22 +81,22 @@ abstract class BaseModel {
       $parent_name) {
         $parent_object = $this->app["{$parent}_model_factory"]->findBy('name', $parent_name);
         if (!empty($parent_object)) {
-          return $this->dao->findAllByLikeWithParent(
+          return $this->returnMany($this->dao->findAllByLikeWithParent(
             $field,
             $value,
             $parent,
             $parent_object->id
-          );
+          ));
         }
       return false;
     }
 
     public function findAllByOperator($field, $value, $operator, $value2) {
-        return $this->dao->findAllByOperator($field, $value, $operator, $value2);
+        return $this->returnMany($this->dao->findAllByOperator($field, $value, $operator, $value2));
     }
 
     public function findAllBy($field, $value) {
-        return $this->dao->findAllBy($field, $value);
+        return $this->returnMany($this->dao->findAllBy($field, $value));
     }
 
     public function save(&$entity) {
@@ -113,17 +107,6 @@ abstract class BaseModel {
         $result = $this->dao->save($entity);
         $this->error = $this->dao->getError();
         return $result;
-    }
-
-    protected function isValid() {
-      $this->errors = $this->app['validator']->validate(
-        $this);
-
-      foreach ($this->errors as $error) {
-        var_dump($error->getPropertyPath() . " " . $error->getMessage() . "\n");
-      }
-      die();
-      return (!count($errors) > 0) ? true : false;
     }
 
     public function __get($name) {
@@ -180,5 +163,47 @@ abstract class BaseModel {
             return $this->has_and_belongs_to_many[$parent];
         }
         return null; // or raise?
+    }
+
+    protected function isValid() {
+      return true;
+      $this->errors = $this->app['validator']->validate(
+        $this);
+
+      foreach ($this->errors as $error) {
+        var_dump($error->getPropertyPath() . " " . $error->getMessage() . "\n");
+      }
+      die();
+      return (!count($errors) > 0) ? true : false;
+    }
+
+    protected function returnMany($data) {
+        if ($data === null || empty($data)) {
+          return;
+        }
+        try {
+          $objects = [];
+          foreach ($data as $row) {
+            $object = $this->app[$this->_LABEL . '_model_factory'];
+            $object->load($row);
+            $objects[] = $object;
+          }
+          return $objects;
+        } catch (\Exception $e) {
+          $this->error = $e->getMessage();
+        }
+    }
+
+    protected function returnOne($data) {
+      if ($data === null || empty($data)) {
+        return;
+      }
+
+      try {
+        $this->load($data);
+        return $this;
+      } catch (\Exception $e) {
+        $this->error = $e->getMessage();
+      }
     }
 }
