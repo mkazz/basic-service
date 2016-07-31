@@ -67,4 +67,17 @@ abstract class BaseEntity {
 
         return null; // or raise?
     }
+
+    public function _validateType($type, $field) {
+      switch ($type) {
+        case 'string':
+          return is_string($this->$field);
+        case 'numeric':
+          return is_numeric($this->$field);
+        case 'boolean':
+          return is_bool($this->$field);
+        default:
+          break;
+      }
+    }
 }
