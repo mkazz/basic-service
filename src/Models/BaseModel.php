@@ -27,9 +27,8 @@ abstract class BaseModel {
           return;
         }
         foreach ($this->getRelations() as $key => $factory) {
-            $model         = $this->app["{$factory}_model_factory"];
-            $related_model = $model->findById($model->$key);
-
+            $model         = $this->app[$factory];
+            $related_model = $model->findById($this->$key);
             if (isset($related_model)) {
                 $relations[$related_model->getLabel()] = $related_model;
             }
@@ -44,7 +43,7 @@ abstract class BaseModel {
         }
 
         foreach ($this->has_many as $key => $join_table) {
-            $model = $this->app["{$key}_model_factory"];
+            $model = $this->app[$key];
             $label = $this->getLabel();
             $related_entities = $model->findAllByParent($label, $this->id);
             if (!empty($related_entities)) {
@@ -184,13 +183,14 @@ abstract class BaseModel {
         try {
           $objects = [];
           foreach ($data as $row) {
-            $object = $this->app[$this->_LABEL . '_model_factory'];
+            $object = $this->app[$this->_LABEL];
             $object->load($row);
             $objects[] = $object;
           }
           return $objects;
         } catch (\Exception $e) {
-          $this->error = $e->getMessage();
+         $this->error = $e->getMessage();
+         return false;
         }
     }
 
@@ -205,5 +205,6 @@ abstract class BaseModel {
       } catch (\Exception $e) {
         $this->error = $e->getMessage();
       }
+      return false;
     }
 }

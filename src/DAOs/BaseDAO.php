@@ -40,6 +40,11 @@ abstract class BaseDAO {
         return $this->findBy("id", $id);
     }
 
+    public function findAll() {
+        $query = "SELECT * FROM {$this->table_name} ORDER BY name ASC";
+        return $this->fetchAll($query);
+    }
+
     public function findAllBy($field, $value) {
         $model = $this->model;
         if ($model->isFieldValid($field)) {
@@ -193,9 +198,7 @@ abstract class BaseDAO {
 
     protected function fetchAll($query, $params = []) {
         try {
-            $models = [];
             return $this->dbal->fetchAll($query, $params);
-
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
         }
