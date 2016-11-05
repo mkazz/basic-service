@@ -13,6 +13,7 @@ abstract class BaseModel {
         $_has_one,
         $_has_many,
         $_belongs_to_many,
+        $_read_only = [],
         $app,
         $dao,
         $constraints = [];
@@ -78,7 +79,7 @@ abstract class BaseModel {
       $value,
       $parent,
       $parent_name) {
-        $parent_object = $this->app["{$parent}_model_factory"]->findBy('name', $parent_name);
+        $parent_object = $this->app[$parent]->findBy('name', $parent_name);
         if (!empty($parent_object)) {
           return $this->returnMany($this->dao->findAllByLikeWithParent(
             $field,
@@ -138,7 +139,7 @@ abstract class BaseModel {
     }
 
     public function isFieldValid($field) {
-        return property_exists($this, $field);
+        return property_exists($this, $field) && !is_object($this->$field);
     }
 
     public function isFieldReadOnly($field) {
@@ -166,13 +167,7 @@ abstract class BaseModel {
 
     protected function isValid() {
       return true;
-      $this->errors = $this->app['validator']->validate(
-        $this);
-
-      foreach ($this->errors as $error) {
-        var_dump($error->getPropertyPath() . " " . $error->getMessage() . "\n");
-      }
-      die();
+      $this->errors = $this->app['validator']->validate($this);
       return (!count($errors) > 0) ? true : false;
     }
 

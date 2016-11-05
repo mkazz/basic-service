@@ -1,6 +1,7 @@
 <?php
 
 namespace MKaczorowski\BasicService\DAOs;
+use MKaczorowski\BasicService\Models as Models;
 
 abstract class BaseDAO {
 
@@ -46,14 +47,12 @@ abstract class BaseDAO {
     }
 
     public function findAllBy($field, $value) {
-        $model = $this->model;
-        if ($model->isFieldValid($field)) {
+        if ($this->model->isFieldValid($field)) {
             $params = [$field => $value];
             $qb = $this->qb;
             $qb->select("*")
                 ->from($this->table_name)
                 ->where("$field = :{$field}");
-
             return $this->fetchAll($qb->getSQL(), $params);
         }
 
@@ -68,7 +67,6 @@ abstract class BaseDAO {
             $qb->select("*")
                 ->from($this->table_name)
                 ->where("{$field} = :{$field}");
-
             return $this->fetchAssoc($qb->getSQL(), $params);
         }
 
@@ -76,8 +74,7 @@ abstract class BaseDAO {
     }
 
     public function findAllByLike($field, $value) {
-      $model = $this->model;
-      if ($model->isFieldValid($field)) {
+      if ($this->model->isFieldValid($field)) {
           $params = [$field => "{$value}%"];
           $qb = $this->qb;
           $qb->select("*")
@@ -91,13 +88,8 @@ abstract class BaseDAO {
       return false;
     }
 
-    public function findAllByLikeWithParent(
-      $field,
-      $value,
-      $parent,
-      $parent_id) {
-      $model = $this->model;
-      if ($model->isFieldValid($field)) {
+    public function findAllByLikeWithParent($field, $value, $parent, $parent_id) {
+      if ($this->model->isFieldValid($field)) {
           $parent_key = "{$parent}_id";
           $params = [
             $field => "{$value}%",
@@ -120,13 +112,12 @@ abstract class BaseDAO {
     }
 
     public function findAllByParent($parent, $parent_id) {
-        $model = $this->model;
         $parent_key = "{$parent}_id";
         $params = [
             $parent_key => $parent_id,
         ];
 
-        $join_table = $model->getJoinTable($parent);
+        $join_table = $this->model->getJoinTable($parent);
         if ($join_table !== null) {
             $qb = $this->qb;
             $qb->select("*")
@@ -144,13 +135,12 @@ abstract class BaseDAO {
     }
 
     public function findAllByOperator($field, $value, $operator, $value2) {
-        $model = $this->model;
         $params = [
             'value'     => $value,
             'value2'    => $value2,
         ];
 
-        if ($model->isFieldValid($field)) {
+        if ($this->model->isFieldValid($field)) {
             $qb = $this->qb;
             $qb->select("*")
                 ->from($this->table_name);
@@ -217,33 +207,25 @@ abstract class BaseDAO {
 
     protected function buildModelSetParams(Models\BaseModel $model) {
         $vars = get_object_vars($model);
-        $model_name = get_class($model);
-        $fresh_model = new $model_name($model);
         $sets = '';
-
         foreach ($vars as $field => $value) {
-            if ($fresh_model->isFieldValid($field) && !$fresh_model->isFieldReadOnly($field)) {
+            if ($model->isFieldValid($field) && !$model->isFieldReadOnly($field)) {
                 $sets .= " {$field} = :{$field},\n";
             }
         }
         $sets = rtrim($sets, ",\n");
-
         return $sets;
     }
 
     protected function buildModelQueryParams(Models\BaseModel $model) {
         $vars = get_object_vars($model);
-        $model_name = get_class($model);
-        $fresh_model = new $model_name($model);
         $params = [];
-
         foreach ($vars as $field => $value) {
-            if ($fresh_model->isFieldValid($field)) {
+            if ($model->isFieldValid($field)) {
                 $params[$field] = $value;
             }
         }
-
+        var_dump($params);
         return $params;
     }
-
 }
