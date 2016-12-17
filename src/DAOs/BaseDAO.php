@@ -225,7 +225,6 @@ abstract class BaseDAO {
                 $params[$field] = $value;
             }
         }
-        var_dump($params);
         return $params;
     }
 }
