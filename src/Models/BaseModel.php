@@ -102,7 +102,7 @@ abstract class BaseModel {
     public function save(&$entity) {
         $this->load($entity);
         if (!$this->isValid()) {
-          return false;
+          throw new \Exception(get_class($this) . ": " . (string) $this->errors);
         }
         $result = $this->dao->save($entity);
         $this->error = $this->dao->getError();
@@ -165,10 +165,9 @@ abstract class BaseModel {
         return null; // or raise?
     }
 
-    protected function isValid() {
-      return true;
+    public function isValid() {
       $this->errors = $this->app['validator']->validate($this);
-      return (!count($errors) > 0) ? true : false;
+      return (count($this->errors) > 0) ? false : true;
     }
 
     protected function returnMany($data) {
