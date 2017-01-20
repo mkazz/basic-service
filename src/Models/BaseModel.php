@@ -4,6 +4,7 @@ namespace MKaczorowski\BasicService\Models;
 
 use Silex\Application;
 use Symfony\Component\Validator\Constraints as Assert;
+Use MKaczorowski\BasicService\Exceptions as Exceptions;
 
 abstract class BaseModel {
 
@@ -100,9 +101,9 @@ abstract class BaseModel {
     }
 
     public function save(&$entity) {
-        $this->load($entity);
+        $this->load($entity);    
         if (!$this->isValid()) {
-          throw new \Exception(get_class($this) . ": " . (string) $this->errors);
+          throw new Exceptions\ValidationException($this->errors);
         }
         $result = $this->dao->save($entity);
         $this->error = $this->dao->getError();

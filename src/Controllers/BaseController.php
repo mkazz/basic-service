@@ -6,6 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use MKaczorowski\BasicService\Models\BaseModel;
+use MKaczorowski\BasicService\Exceptions as Exceptions;
 
 abstract class BaseController {
 
