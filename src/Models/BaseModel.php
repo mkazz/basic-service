@@ -101,11 +101,11 @@ abstract class BaseModel {
     }
 
     public function save(&$entity) {
-        $this->load($entity);    
         if (!$this->isValid()) {
           throw new Exceptions\ValidationException($this->errors);
         }
-        $result = $this->dao->save($entity);
+        //$this->load($entity);
+        $result = $this->dao->save($this);
         $this->error = $this->dao->getError();
         return $result;
     }
@@ -202,4 +202,5 @@ abstract class BaseModel {
       }
       return false;
     }
+
 }
