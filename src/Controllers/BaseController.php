@@ -112,7 +112,6 @@ abstract class BaseController {
         $parent_name
       );
       $response = new JsonResponse($entities);
-
       if (empty($entities)) {
           $response->setStatusCode(204);
       }

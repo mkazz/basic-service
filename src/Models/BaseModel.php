@@ -102,9 +102,9 @@ abstract class BaseModel {
 
     public function save(&$entity) {
         if (!$this->isValid()) {
-          throw new Exceptions\ValidationException($this->errors);
+          throw new Exceptions\ValidationException((string) $this->errors);
         }
-        //$this->load($entity);
+
         $result = $this->dao->save($this);
         $this->error = $this->dao->getError();
         return $result;
@@ -167,8 +167,12 @@ abstract class BaseModel {
     }
 
     public function isValid() {
-      $this->errors = $this->app['validator']->validate($this);
-      return (count($this->errors) > 0) ? false : true;
+      if (method_exists($this, "loadValidatorMetadata")) {
+        $this->errors = $this->app['validator']->validate($this);
+        return (count($this->errors) > 0) ? false : true;
+      } else {
+        $this->errors = [new Exceptions\ValidationException("Validation not configured for: " . get_class($this))];
+      }
     }
 
     protected function returnMany($data) {
