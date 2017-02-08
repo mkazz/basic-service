@@ -100,7 +100,7 @@ abstract class BaseModel {
         return $this->returnMany($this->dao->findAllBy($field, $value));
     }
 
-    public function save(&$entity) {
+    public function save() {
         if (!$this->isValid()) {
           throw new Exceptions\ValidationException((string) $this->errors);
         }
@@ -171,6 +171,7 @@ abstract class BaseModel {
         $this->errors = $this->app['validator']->validate($this);
         return (count($this->errors) > 0) ? false : true;
       } else {
+        return true;
         $this->errors = [new Exceptions\ValidationException("Validation not configured for: " . get_class($this))];
       }
     }
