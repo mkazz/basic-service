@@ -18,6 +18,8 @@ abstract class BaseModel {
         $app,
         $dao,
         $constraints = [];
+    public
+        $errors;
 
     public function __construct(Application $app) {
         $this->app = $app;
@@ -170,10 +172,8 @@ abstract class BaseModel {
       if (method_exists($this, "loadValidatorMetadata")) {
         $this->errors = $this->app['validator']->validate($this);
         return (count($this->errors) > 0) ? false : true;
-      } else {
-        return true;
-        $this->errors = [new Exceptions\ValidationException("Validation not configured for: " . get_class($this))];
       }
+      return true;
     }
 
     protected function returnMany($data) {
