@@ -5,23 +5,21 @@ namespace MKaczorowski\BasicService\Controllers;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use MKaczorowski\BasicService\Entities\BaseEntity;
 use MKaczorowski\BasicService\Models\BaseModel;
+use MKaczorowski\BasicService\Exceptions as Exceptions;
 
 abstract class BaseController {
 
     protected
-        $model_factory_key,
-        $entity_factory_key;
+        $model_factory_key;
 
     protected function _list(Application $app, Request $request) {
         $model  = $app[$this->model_factory_key];
-        $entity = $app[$this->entity_factory_key];
 
-        $entities = $model->findAll();
-        $response = new JsonResponse($entities);
+        $models = $model->findAll();
+        $response = new JsonResponse($models);
 
-        if (empty($entities)) {
+        if (empty($models)) {
             $response->setStatusCode(204);
         }
 
@@ -30,29 +28,24 @@ abstract class BaseController {
 
     public function save(Application $app, Request $request) {
         $model  = $app[$this->model_factory_key];
-        $entity = $app[$this->entity_factory_key];
+        $model->load(json_decode($request->getContent()));
+        $result = $model->save();
 
-        $entity->load(json_decode($request->getContent()));
-        $result = $model->save($entity);
-
-        $response = new JsonResponse($entity);
+        $response = new JsonResponse($model);
         $response->setStatusCode(201);
 
         if ($result !== true) {
             $response->setStatusCode(400);
         }
-
         return $response;
     }
 
     public function findById(Application $app, Request $request) {
-        $model  = $app[$this->model_factory_key];
         $id     = $request->get('id');
-        $entity = $model->findById($id);
+        $model = $app[$this->model_factory_key]->findById($id);
+        $response = new JsonResponse($model);
 
-        $response = new JsonResponse($entity);
-
-        if (empty($entity)) {
+        if (empty($model)) {
             $response->setStatusCode(204);
         }
 
@@ -64,10 +57,10 @@ abstract class BaseController {
         $field  = $request->get('field');
         $value  = $request->get('value');
 
-        $entity = $model->findBy($field, $value);
-        $response = new JsonResponse($entity);
+        $result = $model->findBy($field, $value);
+        $response = new JsonResponse($result);
 
-        if (!$entity instanceof BaseEntity && $entity !== false) {
+        if (!$result instanceof BaseModel && $result !== false) {
             $response->setStatusCode(204);
         } elseif ($entity === false) {
             $response->setStatusCode(400);
@@ -81,9 +74,8 @@ abstract class BaseController {
       $value = $request->get('value');
 
       $model = $app[$this->model_factory_key];
-      $entity = $app[$this->entity_factory_key];
 
-      if (!$entity->isFieldValid($field)){
+      if (!$model->isFieldValid($field)){
           $response = new JsonResponse(['error' => "$field is not a valid field"]);
           $response->setStatusCode(400);
           return $response;
@@ -106,9 +98,8 @@ abstract class BaseController {
       $parent_name  = $request->get('parent_name');
 
       $model = $app[$this->model_factory_key];
-      $entity = $app[$this->entity_factory_key];
 
-      if (!$entity->isFieldValid($field)){
+      if (!$model->isFieldValid($field)){
           $response = new JsonResponse(['error' => "$field is not a valid field"]);
           $response->setStatusCode(400);
           return $response;
@@ -121,7 +112,6 @@ abstract class BaseController {
         $parent_name
       );
       $response = new JsonResponse($entities);
-
       if (empty($entities)) {
           $response->setStatusCode(204);
       }
@@ -134,9 +124,8 @@ abstract class BaseController {
         $value = $request->get('value');
 
         $model = $app[$this->model_factory_key];
-        $entity = $app[$this->entity_factory_key];
 
-        if (!$entity->isFieldValid($field)){
+        if (!$model->isFieldValid($field)){
             $response = new JsonResponse(['error' => "$field is not a valid field"]);
             $response->setStatusCode(400);
             return $response;
@@ -165,7 +154,6 @@ abstract class BaseController {
         $value   = $request->get('value_1');
         $value2  = $request->get('value_2');
         $model = $app[$this->model_factory_key];
-        $entity = $app[$this->entity_factory_key];
         $operator = $request->get('operator');
 
         if (!in_array($operator, $valid_operators)) {
@@ -174,7 +162,7 @@ abstract class BaseController {
             return $response;
         }
 
-        if (!$entity->isFieldValid($field)){
+        if (!$model->isFieldValid($field)){
             $response = new JsonResponse(['error' => "$field is not a valid field"]);
             $response->setStatusCode(400);
             return $response;
