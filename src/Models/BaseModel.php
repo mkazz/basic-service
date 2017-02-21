@@ -9,20 +9,29 @@ Use MKaczorowski\BasicService\Exceptions as Exceptions;
 abstract class BaseModel {
 
     protected
+        $_errors,
         $_LABEL,
         $_LABEL_PLURAL,
-        $_has_one,
-        $_has_many,
-        $_belongs_to_many,
+        $_has_one = [],
+        $_has_many = [],
+        $_belongs_to_many = [],
         $_read_only = [],
+        $_synthetic_fields = [],
         $app,
         $dao,
         $constraints = [];
-    public
-        $errors;
 
     public function __construct(Application $app) {
         $this->app = $app;
+        //init synthetic fields
+        foreach ($this->_synthetic_fields as $field) {
+          $this->$field = '';
+        }
+
+        //init has ob_get_contents
+        foreach ($this->_has_one as $fk => $value) {
+          $this->$value = '';
+        }
     }
 
     public function fetchRelations() {
@@ -104,22 +113,28 @@ abstract class BaseModel {
 
     public function save() {
         if (!$this->isValid()) {
-          throw new Exceptions\ValidationException((string) $this->errors);
+          throw new Exceptions\ValidationException((string) $this->_errors);
         }
 
         $result = $this->dao->save($this);
-        $this->error = $this->dao->getError();
+        $this->_errors = $this->dao->getError();
         return $result;
     }
 
     public function __get($name) {
         switch ($name) {
+          case 'errors':
+            return $this->_errors;
+            break;
           case 'has_many':
             return $this->_has_many;
+            break;
           case 'has_and_belongs_to_many':
             return $this->_has_and_belongs_to_many;
+            break;
           case 'has_one':
             return $this->_has_one;
+            break;
           default:
             return null;
         }
@@ -170,8 +185,8 @@ abstract class BaseModel {
 
     public function isValid() {
       if (method_exists($this, "loadValidatorMetadata")) {
-        $this->errors = $this->app['validator']->validate($this);
-        return (count($this->errors) > 0) ? false : true;
+        $this->_errors = $this->app['validator']->validate($this);
+        return (count($this->_errors) > 0) ? false : true;
       }
       return true;
     }
@@ -208,4 +223,9 @@ abstract class BaseModel {
       return false;
     }
 
+    public function isSynthetic($field) {
+      return
+        in_array($field, $this->_synthetic_fields) ||
+        in_array($field, $this->_has_one);
+    }
 }
