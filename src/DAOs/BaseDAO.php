@@ -166,7 +166,6 @@ abstract class BaseDAO {
                 {$this->table_name}
             SET
                 {$sets}";
-
         $result = $this->dbal->executeQuery($query, $params);
         if ($result->rowCount() > 0) {
             if (empty($params['id'])) {
@@ -209,7 +208,11 @@ abstract class BaseDAO {
         $vars = get_object_vars($model);
         $sets = '';
         foreach ($vars as $field => $value) {
-            if ($model->isFieldValid($field) && !$model->isFieldReadOnly($field)) {
+            if (
+              $model->isFieldValid($field) &&
+              !$model->isFieldReadOnly($field) &&
+              !$model->isSynthetic($field)
+            ) {
                 $sets .= " {$field} = :{$field},\n";
             }
         }
@@ -221,7 +224,7 @@ abstract class BaseDAO {
         $vars = get_object_vars($model);
         $params = [];
         foreach ($vars as $field => $value) {
-            if ($model->isFieldValid($field)) {
+            if ($model->isFieldValid($field) && !$model->isSynthetic($field)) {
                 $params[$field] = $value;
             }
         }
