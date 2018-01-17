@@ -8,7 +8,7 @@ use Silex\Provider\DoctrineServiceProvider;
 
 abstract class BaseTest extends \PHPUnit_Framework_TestCase {
 
-    protected 
+    protected
         $app;
 
     public function setUp() {

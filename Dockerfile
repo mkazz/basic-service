@@ -1,9 +1,10 @@
-from phusion/baseimage
+from ubuntu:14.04
 
 RUN apt-get update -y
 RUN apt-get install php5-cli -y
 RUN apt-get install mysql-client -y
 RUN apt-get install php5-mysql -y
+
 
 RUN echo "display_errors=On" >> /etc/php5/cli/php.ini
 RUN echo "log_errors=Off" >> /etc/php5/cli/php.ini
@@ -16,4 +17,3 @@ ADD . /app
 
 WORKDIR /app
 CMD /app/run
-

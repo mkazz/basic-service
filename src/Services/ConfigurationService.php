@@ -18,8 +18,6 @@ class ConfigurationService {
             ];
 
         }
-
         return self::$db_config;
     }
 }
-

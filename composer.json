@@ -21,7 +21,8 @@
     "autoload": {
         "psr-4": {
             "MKaczorowski\\BasicService\\": "src/",
-            "MKaczorowski\\BasicService\\Tests\\": "tests/unit/"
+            "MKaczorowski\\BasicService\\Tests\\": "tests/unit/",
+            "MKaczorowski\\BasicService\\Tests\\Jig\\": "tests/Jig"
         }
     }
 
