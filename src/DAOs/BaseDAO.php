@@ -170,7 +170,9 @@ abstract class BaseDAO {
         if ($result->rowCount() > 0) {
             if (empty($params['id'])) {
                 $model->id = $this->dbal->lastInsertId();
+                $model->save_state = 'CREATED';
             }
+            $model->save_state = 'UPDATED';
             return true;
         }
         return false;
