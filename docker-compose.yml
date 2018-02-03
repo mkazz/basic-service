@@ -1,0 +1,29 @@
+db:
+  image: mysql
+  environment:
+   - MYSQL_ROOT_PASSWORD=root
+   - MYSQL_DATABASE=basic
+  ports:
+    - "3306:3306"
+dbseeder:
+  image: mkaczorowski/dbseeder
+  environment:
+   - SEED_FILE=build.sql
+  links:
+   - db:mysql
+  volumes:
+   - ./:/seed_source
+basic-service:
+  build: .
+  ports:
+   - "5000:80"
+  links:
+   - db:database
+  environment:
+   - DB_HOST=database
+   - DB_DRIVER=pdo_mysql
+   - DB_USER=root
+   - DB_PASSWD=root
+   - DB_SCHEMA=basic
+  volumes:
+   - ./:/app

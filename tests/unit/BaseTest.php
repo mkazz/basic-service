@@ -12,9 +12,10 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
         $app;
 
     public function setUp() {
-        $this->app = new BaseApplication();
+        $this->app = require __DIR__."/../Jig/app.php";
         $db_config = $this->app['config']->db();
         $db_config['dbname'] =  $db_config['dbname'];
         $this->app->register(new DoctrineServiceProvider(), ['db.options' => $db_config]);
+        $this->dbal = $this->app['db'];
     }
 }

@@ -1,0 +1,2 @@
+#!/bin/sh
+docker exec vehicleservice_web_1 vendor/bin/phpunit
