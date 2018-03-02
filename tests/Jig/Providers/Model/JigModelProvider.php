@@ -11,8 +11,7 @@ class JigModelProvider implements ServiceProviderInterface {
 
   public function register(Application $app) {
     $app['jig_model'] = function () use ($app) {
-      $jig_model = new Models\JigModel($app);
-      return $jig_model;
+      return new Models\JigModel($app);
     };
   }
 

@@ -38,6 +38,9 @@ abstract class BaseDAO {
     }
 
     public function findById($id) {
+        if (!is_int($id)) {
+
+        }
         return $this->findBy("id", $id);
     }
 

@@ -8,7 +8,7 @@ db:
 dbseeder:
   image: mkaczorowski/dbseeder
   environment:
-   - SEED_FILE=build.sql
+   - SEED_FILE=tests/Jig/jig_structure.sql
   links:
    - db:mysql
   volumes:
@@ -24,6 +24,6 @@ basic-service:
    - DB_DRIVER=pdo_mysql
    - DB_USER=root
    - DB_PASSWD=root
-   - DB_SCHEMA=basic
+   - DB_SCHEMA=basic-service
   volumes:
    - ./:/app

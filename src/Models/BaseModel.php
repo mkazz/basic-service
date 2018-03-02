@@ -4,7 +4,7 @@ namespace MKaczorowski\BasicService\Models;
 
 use Silex\Application;
 use Symfony\Component\Validator\Constraints as Assert;
-Use MKaczorowski\BasicService\Exceptions as Exceptions;
+use MKaczorowski\BasicService\Exceptions as Exceptions;
 
 abstract class BaseModel {
 
@@ -32,6 +32,7 @@ abstract class BaseModel {
         foreach ($this->_has_one as $fk => $value) {
           $this->$value = '';
         }
+
     }
 
     public function fetchRelations() {
