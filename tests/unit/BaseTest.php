@@ -5,8 +5,9 @@ namespace MKaczorowski\BasicService\Tests;
 use MKaczorowski\BasicService\BaseApplication;
 use MKaczorowski\BasicService\Providers;
 use Silex\Provider\DoctrineServiceProvider;
+use PHPUnit\Framework\TestCase;
 
-abstract class BaseTest extends \PHPUnit_Framework_TestCase {
+abstract class BaseTest extends TestCase {
 
     protected
         $app;

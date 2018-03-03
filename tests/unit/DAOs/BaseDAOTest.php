@@ -42,9 +42,21 @@ class BaseDAOTest extends BaseTest {
 
     public function testFindByIdNull() {
       $dao = $this->newDao();
-      $model = $this->newModel();
+      $this->expectException(\TypeError::class);
       $result = $dao->findById(null);
+    }
+
+    public function testFindByIdInvalidString() {
+      $dao = $this->newDao();
+      $this->expectException(\TypeError::class);
+      $result = $dao->findById("thisisnotright99");
+    }
+
+    public function testFindByIdValidString() {
+      $dao = $this->newDao();
+      $model = $this->newModel();
+      $id = (string) $model->id;
+      $result = $dao->findById($id);
       $this->assertEquals($result['id'], $model->id);
-      $this->assertEquals($result['name'], $model->name);
     }
 }
