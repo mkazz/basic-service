@@ -42,7 +42,7 @@ abstract class BaseDAO {
     }
 
     public function findAll() {
-        $query = "SELECT * FROM {$this->table_name} ORDER BY name ASC";
+        $query = "SELECT * FROM {$this->table_name}";
         return $this->fetchAll($query);
     }
 

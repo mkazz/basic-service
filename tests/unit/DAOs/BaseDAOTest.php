@@ -13,13 +13,17 @@ class BaseDAOTest extends BaseTest {
       $dao,
       $dbal;
 
+    private function truncate() {
+      $this->dbal->executeQuery("TRUNCATE TABLE jigs");
+    }
+
     private function newDao() {
       return new JigDAO($this->app['db'], $this->app['jig_model'], 'jigs');
     }
 
     private function newModel() {
       $model = $this->app['jig_model'];
-      $model->name = "find_by_id_test";
+      $model->name = "find_by_id_test" . rand(1,100000);
       $model->save();
       return $model;
     }
@@ -36,8 +40,8 @@ class BaseDAOTest extends BaseTest {
       $dao = $this->newDao();
       $model = $this->newModel();
       $result = $dao->findById($model->id);
-      $this->assertEquals($result['id'], $model->id);
-      $this->assertEquals($result['name'], $model->name);
+      $this->assertEquals($model->id, $result['id'] );
+      $this->assertEquals($model->name, $result['name']);
     }
 
     public function testFindByIdNull() {
@@ -57,6 +61,17 @@ class BaseDAOTest extends BaseTest {
       $model = $this->newModel();
       $id = (string) $model->id;
       $result = $dao->findById($id);
-      $this->assertEquals($result['id'], $model->id);
+      $this->assertEquals($model->id, $result['id']);
+    }
+
+    public function testFindAll(){
+      $this->truncate();
+      for ($i = 0; $i < 3; $i++){
+        $this->newModel();
+      }
+      $dao = $this->newDao();
+      $result = $dao->findAll();
+      $this->assertCount(3, $result);
+      $this->truncate();
     }
 }
