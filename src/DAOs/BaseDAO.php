@@ -2,6 +2,7 @@
 
 namespace MKaczorowski\BasicService\DAOs;
 use MKaczorowski\BasicService\Models as Models;
+use MKaczorowski\BasicService\Exceptions as Exceptions;
 
 abstract class BaseDAO {
 
@@ -10,6 +11,7 @@ abstract class BaseDAO {
         $dbal,
         $error,
         $table_name,
+        $save_state,
         $operators = [
             'lessThan'              => '<',
             'greaterThan'           => '>',
@@ -55,9 +57,7 @@ abstract class BaseDAO {
                 ->where("$field = :{$field}");
             return $this->fetchAll($qb->getSQL(), $params);
         }
-
-        $this->error = "Field: {$field} is not a valid field";
-        return false;
+        $this->invalidField($field);
     }
 
     public function findBy($field, $value) {
@@ -69,8 +69,7 @@ abstract class BaseDAO {
                 ->where("{$field} = :{$field}");
             return $this->fetchAssoc($qb->getSQL(), $params);
         }
-
-        throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
+        $this->invalidField($field);
     }
 
     public function findAllByLike($field, $value) {
@@ -83,9 +82,7 @@ abstract class BaseDAO {
 
           return $this->fetchAll($qb->getSQL(), $params);
       }
-
-      $this->error = "Field: {$field} is not a valid field";
-      return false;
+      $this->invalidField($field);
     }
 
     public function findAllByLikeWithParent($field, $value, $parent, $parent_id) {
@@ -106,9 +103,7 @@ abstract class BaseDAO {
 
           return $this->fetchAll($qb->getSQL(), $params);
       }
-
-      $this->error = "Field: {$field} is not a valid field";
-      return false;
+      $this->invalidField($field);
     }
 
     public function findAllByParent($parent, $parent_id) {
@@ -153,14 +148,13 @@ abstract class BaseDAO {
 
             return $this->fetchAll($qb->getSQL(), $params);
         }
-
-        throw new \Exception(get_called_class() . " - Field: {$field} is not a valid field");
+        $this->invalidField($field);
     }
 
     public function save(Models\BaseModel &$model) {
+        unset($model->save_state);
         $params = $this->buildModelQueryParams($model);
         $sets   = $this->buildModelSetParams($model);
-
         $query = "
             REPLACE INTO
                 {$this->table_name}
@@ -231,5 +225,9 @@ abstract class BaseDAO {
             }
         }
         return $params;
+    }
+
+    protected function invalidField($field) {
+      throw new Exceptions\InvalidFieldException(get_called_class() . " - Field: {$field} is not a valid field");
     }
 }

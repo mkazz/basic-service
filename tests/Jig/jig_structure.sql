@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `basic-service`.`jigs` ;
 CREATE TABLE IF NOT EXISTS `basic-service`.`jigs` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
+  `type` VARCHAR(45) NOT NULL DEFAULT 'none',
   `parent_id` INT DEFAULT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB

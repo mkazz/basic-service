@@ -74,4 +74,32 @@ class BaseDAOTest extends BaseTest {
       $this->assertCount(3, $result);
       $this->truncate();
     }
+
+    public function testFindAllBy() {
+      $this->truncate();
+      $dao = $this->newDao();
+      $model = $this->newModel();
+      $model->name = "bob1";
+      $model->save();
+      $model = $this->newModel();
+      $model->name = "bob1";
+      $model->save();
+      $model = $this->newModel();
+      $model->name = "bob2";
+      $model->save();
+      $result = $dao->findAllBy('name', 'bob2');
+      $this->assertCount(1, $result);
+      $result = $dao->findAllBy('name', 'bob1');
+      $this->assertCount(2, $result);
+      $this->truncate();
+    }
+
+    public function testFindAllByInvalidField() {
+      $dao = $this->newDao();
+      $this->expectException(
+        \MKaczorowski\BasicService\Exceptions\InvalidFieldException::class
+      );
+      $result = $dao->findAllBy('not_a_real_field', 'plumbus');
+      $result = $dao->findAllBy(null, "poop");
+    }
 }
