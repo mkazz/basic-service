@@ -1,7 +1,5 @@
 db:
   image: mysql
-  depends_on:
-    - dbseeder
   environment:
    - MYSQL_ROOT_PASSWORD=root
    - MYSQL_DATABASE=basic
