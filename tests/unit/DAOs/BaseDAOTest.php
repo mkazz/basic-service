@@ -23,7 +23,7 @@ class BaseDAOTest extends BaseTest {
 
     private function newModel() {
       $model = $this->app['jig_model'];
-      $model->name = "find_by_id_test" . rand(1,100000);
+      $model->name = $this->randomString();
       $model->save();
       return $model;
     }
@@ -101,5 +101,28 @@ class BaseDAOTest extends BaseTest {
       );
       $result = $dao->findAllBy('not_a_real_field', 'plumbus');
       $result = $dao->findAllBy(null, "poop");
+    }
+
+    public function testFindBy() {
+      $dao = $this->newDao();
+      $model = $this->newModel();
+      $name = $this->randomString();
+      $result = $dao->findBy('name', $name);
+      $this->assertEmpty($result);
+
+      $model->name = $name;
+      $model->save();
+
+      $result = $dao->findBy('name', $name);
+      $this->assertEquals($name, $result['name']);
+    }
+
+    public function testFindByInvalidField() {
+      $dao = $this->newDao();
+      $this->expectException(
+        \MKaczorowski\BasicService\Exceptions\InvalidFieldException::class
+      );
+      $dao->findBy('not_a_real_field', 'plumbus');
+      $dao->findBy(null, "plumbus");
     }
 }

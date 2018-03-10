@@ -19,4 +19,19 @@ abstract class BaseTest extends TestCase {
         $this->app->register(new DoctrineServiceProvider(), ['db.options' => $db_config]);
         $this->dbal = $this->app['db'];
     }
+
+    public function randomString() {
+      return substr(
+        hash(
+          'sha256',
+          'randomString_' .
+            hash(
+              'sha256',
+              'randomString_' . rand(0,9999999)
+            )
+        ),
+        0,
+        44
+      );
+    }
 }
