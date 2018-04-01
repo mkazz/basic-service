@@ -76,7 +76,7 @@ abstract class BaseModel {
     }
 
     public function findById($id) {
-        return $this->returnOne($this->dao->findById($id));
+        return $this->returnOne($this->dao->findById((int) $id));
     }
 
     public function findBy($field, $value) {
